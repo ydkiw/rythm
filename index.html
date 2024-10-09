@@ -42,21 +42,22 @@ font-style:normal;font-weight:400;src:url('https://cdn.df.nexon.com/img/common/f
   background-position: center;
   z-index: 1;
   background-image: 
-    linear-gradient(to top, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.7)),
-    url('your-image.jpg'); /* 각 버튼에 적합한 이미지 URL을 추가 */
+    linear-gradient(to right, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0)),
+    url('your-image.jpg'); /* 기본 이미지 URL */
 }
 
-    .blue {
-      background-color: #4A90E2;
-      background-image: linear-gradient(to top, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0)), url('leneda.jpg');
-      z-index: 1;
-    }
-
-    .red {
-      background-color: #D0021B;
-      background-image: url('starwalk.jpg');
-      z-index: 1;
-    }
+.blue {
+  background-image: 
+    linear-gradient(to right, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0)),
+    url('leneda.jpg'); /* 파란색 버튼의 이미지 */
+  z-index: 1;
+}
+.red {
+  background-image: 
+    linear-gradient(to right, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0)),
+    url('starwalk.jpg'); /* 빨간색 버튼의 이미지 */
+  z-index: 1;
+}
 
     #gameBackground {
       position: absolute;
