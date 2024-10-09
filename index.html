@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>리듬게임</title>
+ <style>
+    body {
+      font-family: DNFBitBitv2; sans-serif;
+      background-color: black;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+    @font-face{
+font-family:'DNFBitBitv2';
+font-style:normal;font-weight:400;src:url('https://cdn.df.nexon.com/img/common/font/DNFBitBitv2.otf')format('opentype')}
+
+    #initialScreen {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      height: 100vh;
+      z-index: 1;
+    }
+
+    .message {
+      flex: 1;
+      text-align: center;
+      font-size: 24px;
+      z-index: 1;
+    }
+
+.music-button {
+  width: 25%;
+  height: 100%;
+  cursor: pointer;
+  background-size: cover;
+  background-position: center;
+  z-index: 1;
+  background-image: 
+    linear-gradient(to top, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.7)),
+    url('your-image.jpg'); /* 각 버튼에 적합한 이미지 URL을 추가 */
+}
+
+    .blue {
+      background-color: #4A90E2;
+      background-image: linear-gradient(to top, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0)), url('leneda.jpg');
+      z-index: 1;
+    }
+
+    .red {
+      background-color: #D0021B;
+      background-image: url('starwalk.jpg');
+      z-index: 1;
+    }
+
+    #gameBackground {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('space.jpg');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      opacity: 0.2; /* 옅은 투명도 설정 */
+      z-index: -1;
+      display: none; /* 기본적으로 숨김 */
+    }
+
+    .lane {
+      position: relative;
+      width: 160px;
+      height: 100vh;
+      border: 1px solid white;
+      display: inline-block;
+      margin: 0 5px;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .target {
+     position: absolute;
+      bottom: 100%;
+      width: 100%;
+      height: 60px;
+      background: linear-gradient(to top, rgba(255, 255, 0, 0.8), rgba(255, 255, 0, 0)); /* 위아래 그라데이션 */
+      border-radius: 10px; /* 부드러운 모서리 */
+      transition: bottom 2s linear;
+      z-index: 1;
+    }
+
+    .target.hit {
+      background-color: lightgreen;
+      box-shadow: 0 0 15px lightgreen;
+      transition: opacity 0.5s ease, bottom 2s linear;
+      opacity: 0;
+      z-index: 1;
+    }
+
+    .target.hidden {
+      opacity: 0;
+      transition: opacity 0.5s ease-out;
+      z-index: 1;
+    }
+
+    .hitZone {
+      position: absolute;
+      bottom: 20%;
+      width: 100%;
+      height: 20%;
+      background: linear-gradient(to top, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0));
+      z-index: 1;
+    }
+
+    #gameContainer {
+      display: none;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* 게임 정보 영역 */
+    .scoreContainer, .comboContainer, .progressContainer, .lifeContainer {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .scoreContainer {
+      left: -100px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 30px;
+    }
+
+    .comboContainer {
+      right: -100px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size:30px;
+    }
+
+  .progressContainer {
+    top: 20px;
+    left: -300px; /* 진행도가 라이프 옆에 오도록 설정 */
+    font-size: 24px;
+    font-weight: bold;
+  }
+
+    .lifeContainer {
+      top: 20px;
+      left: -500px;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    #endScreen {
+      display: none;
+      text-align: center;
+    }
+
+    .volume-control {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      color: white;
+      font-size: 14px;
+      z-index: 2;
+    }
+
+    .volume-control input[type="range"] {
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+  <!-- 초기 화면 -->
+  <div id="initialScreen">
+    <div class="message" style="margin-top: -500px;">
+      <h2 style="font-size: 60px;">노트 맞추기 게임</h2>
+      <p style="color: gray; margin-top: 300px;">4개의 레인을 따라 내려오는 노트를 정확한 타이밍에 맞추세요. <br>숫자 키 1,2,3,4번으로 맞출 수 있습니다. <br>원하는 배경 음악을 선택하고 진행하세요.</p>
+    </div>
+    <div class="music-button blue" onclick="startGame(1)"></div>
+    <div class="music-button red" onclick="startGame(2)"></div>
+  </div>
+
+  <!-- 게임 화면 -->
+  <div id="gameContainer">
+    <div id="gameBackground"></div>
+    <div class="scoreContainer">
+      <h2>점수</h2>
+      <div id="score">0</div>
+    </div>
+    <div class="comboContainer">
+      <h2>콤보</h2>
+      <div id="combo">0</div>
+    </div>
+    <div class="progressContainer">
+      <div>진행도</div>
+      <div id="progress">0%</div>
+    </div>
+    <div class="lifeContainer" style="font-style: bold;">
+      라이프: <span id="life">10</span>
+    </div>
+    <div id="lanes">
+      <div class="lane" id="lane1"><div class="hitZone"></div></div>
+      <div class="lane" id="lane2"><div class="hitZone"></div></div>
+      <div class="lane" id="lane3"><div class="hitZone"></div></div>
+      <div class="lane" id="lane4"><div class="hitZone"></div></div>
+    </div>
+  </div>
+
+  <!-- 게임 종료 화면 -->
+  <div id="endScreen">
+    <h1>게임 종료!</h1>
+    <h2>최종 점수: <span id="finalScore">0</span></h2>
+    <p>진행도: <span id="finalProgress"></span>%</p>
+    <button onclick="retryGame()">다시 도전하기</button>
+    <button onclick="goToInitialScreen()">초기화면으로</button>
+  </div>
+  <div class="volume-control">
+    <label for="volumeSlider" style="margin-left: -1000px;">볼륨(30% 권장):</label>
+    <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="1">
+  </div>
+  <script>
+    const audio = new Audio();
+    let score = 0;
+    let combo = 0;
+    let life = 10;
+    let gameInterval;
+    const lanes = document.querySelectorAll('.lane');
+    const targets = Array(4).fill(null);
+
+    const volumeSlider = document.getElementById('volumeSlider');
+    volumeSlider.addEventListener('input', function() {
+      audio.volume = volumeSlider.value;
+    });
+
+    function startGame(song) {
+      clearInterval(gameInterval);  // 기존 인터벌 초기화
+      score = 0;
+      combo = 0;
+      life = 10;
+      updateScore();
+      updateCombo();
+      updateLife();
+      audio.src = song === 1 ? 'leneda.mp3' : 'starwalk.mp3';
+      audio.volume = volumeSlider.value;
+      audio.play();
+      document.getElementById('initialScreen').style.display = 'none';
+      document.getElementById('gameContainer').style.display = 'block';
+      document.getElementById('gameBackground').style.display = 'block';
+
+      gameInterval = setInterval(() => {
+        const randomLane = Math.floor(Math.random() * 4);
+        if (!targets[randomLane]) {
+          createTarget(lanes[randomLane], randomLane);
+        }
+        const progressPercent = Math.min(100, (audio.currentTime / audio.duration) * 100).toFixed(1);
+        updateProgress(progressPercent);
+        if (audio.currentTime >= audio.duration) {
+          endGame();
+        }
+      }, 800);
+    }
+
+    function createTarget(lane, index) {
+      const target = document.createElement('div');
+      target.classList.add('target');
+      target.style.transition = `bottom ${1.5 + Math.random() * 0.5}s linear`;
+      lane.appendChild(target);
+      targets[index] = target;
+
+      setTimeout(() => { target.style.bottom = '0'; }, 50);
+
+      target.addEventListener('transitionend', () => {
+        if (!target.classList.contains('hit')) {
+          targets[index] = null;
+          target.remove();
+          life--;
+          updateLife();
+          if (life <= 0) { endGame(); }
+        }
+      });
+    }
+
+    function updateScore() {
+      document.getElementById('score').textContent = score;
+    }
+
+    function updateCombo() {
+      document.getElementById('combo').textContent = combo;
+    }
+
+    function updateProgress(progressPercent) {
+      document.getElementById('progress').textContent = `${progressPercent}%`;
+    }
+
+    function updateLife() {
+      document.getElementById('life').textContent = life;
+    }
+
+    function endGame() {
+      clearInterval(gameInterval);  // 게임 종료 시 인터벌 초기화
+      audio.pause();
+      document.getElementById('gameContainer').style.display = 'none';
+      document.getElementById('endScreen').style.display = 'block';
+      document.getElementById('finalScore').textContent = score;
+
+      // 최종 진행도 계산 및 표시
+      const finalProgress = Math.min(100, (audio.currentTime / audio.duration) * 100).toFixed(1);
+      document.getElementById('finalProgress').textContent = finalProgress;
+    }
+
+    function retryGame() {
+      clearInterval(gameInterval);  // 이전 게임의 인터벌 초기화
+      document.getElementById('endScreen').style.display = 'none';
+      document.getElementById('gameContainer').style.display = 'block';
+      
+      // 노트 초기화
+      lanes.forEach((lane, index) => {
+        if (targets[index]) {
+          targets[index].remove();
+          targets[index] = null;
+        }
+      });
+
+      startGame(1); // 기본적으로 첫 번째 음악으로 재시작
+    }
+
+    function goToInitialScreen() {
+      clearInterval(gameInterval);  // 초기 화면으로 돌아갈 때 인터벌 초기화
+      document.getElementById('endScreen').style.display = 'none';
+      document.getElementById('initialScreen').style.display = 'flex';
+    }
+
+    // 키 입력 인식
+    document.addEventListener('keydown', (event) => {
+      const keyMap = {
+        '1': 0,
+        '2': 1,
+        '3': 2,
+        '4': 3
+      };
+      const laneIndex = keyMap[event.key];
+
+      if (laneIndex !== undefined) {
+          if (targets[laneIndex]) {
+              // 올바른 키 입력
+              targets[laneIndex].classList.add('hit'); // 이펙트 적용
+              targets[laneIndex].classList.add('hidden'); // 타격 후 숨기기
+              targets[laneIndex] = null;
+              score += 10;
+              combo += 1;
+              updateScore();
+              updateCombo();
+          } else {
+              // 잘못된 키 입력
+              life--;
+              updateLife();
+              combo = 0; // 콤보 초기화
+              updateCombo();
+              if (life <= 0) { endGame(); }
+          }
+      }
+    });
+  </script>
+</body>
+</html>
