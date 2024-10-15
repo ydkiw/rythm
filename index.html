@@ -15,6 +15,16 @@
       height: 100vh;
       overflow: hidden;
     }
+    video {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.01; /* 투명도 조절 */
+  z-index: -1; /* 배경으로 위치시킴 */
+}
     @font-face{
       font-family:'DNFBitBitv2';
       font-style:normal;
@@ -22,71 +32,71 @@
       src:url('https://cdn.df.nexon.com/img/common/font/DNFBitBitv2.otf') format('opentype');
     }
     @keyframes highlight {
-  0% {
-    transform: scale(1);
-    color: white;
-  }
-  50% {
-    transform: scale(1.3);
-    color: yellow;
-  }
-  100% {
-    transform: scale(1);
-    color: white;
-  }
-}
-
-.highlight {
-  animation: highlight 0.5s ease;
-}
-
-@keyframes lifeChange {
-  0% {
-    transform: scale(1) translateX(0);
-    color: white;
-  }
-  10% {
-    transform: scale(1.2) translateX(-10px);
-    color: red;
-  }
-  20% {
-    transform: scale(1.1) translateX(10px);
-    color: white;
-  }
-  30% {
-    transform: scale(1.2) translateX(-10px);
-    color: red;
-  }
-  40% {
-    transform: scale(1.1) translateX(10px);
-    color: white;
-  }
-  50% {
-    transform: scale(1) translateX(0);
-    color: white;
-  }
-}
-
-.life-change {
-  animation: lifeChange 0.5s ease;
-}
-
-button {
-  border: 2px solid white;
-  background-color: black;
-  color: white;
-  padding: 10px 20px;
-  font-size: 16px;
-  font-family: 'DNFBitBitv2', sans-serif;
-  cursor: pointer;
-  transition: all 0.3s ease; /* Smooth transition for hover effect */
-}
-
-button:hover {
-  background-color: white;
-  color: black;
-}
-
+      0% {
+        transform: scale(1);
+        color: white;
+      }
+      50% {
+        transform: scale(1.3);
+        color: yellow;
+      }
+      100% {
+        transform: scale(1);
+        color: white;
+      }
+    }
+    
+    .highlight {
+      animation: highlight 0.5s ease;
+    }
+    
+    @keyframes lifeChange {
+      0% {
+        transform: scale(1) translateX(0);
+        color: white;
+      }
+      10% {
+        transform: scale(1.2) translateX(-10px);
+        color: red;
+      }
+      20% {
+        transform: scale(1.1) translateX(10px);
+        color: white;
+      }
+      30% {
+        transform: scale(1.2) translateX(-10px);
+        color: red;
+      }
+      40% {
+        transform: scale(1.1) translateX(10px);
+        color: white;
+      }
+      50% {
+        transform: scale(1) translateX(0);
+        color: white;
+      }
+    }
+    
+    .life-change {
+      animation: lifeChange 0.5s ease;
+    }
+    
+    button {
+      border: 2px solid white;
+      background-color: black;
+      color: white;
+      padding: 10px 20px;
+      font-size: 16px;
+      font-family: 'DNFBitBitv2', sans-serif;
+      cursor: pointer;
+      transition: all 0.3s ease; /* Smooth transition for hover effect */
+    }
+    
+    button:hover {
+      background-color: white;
+      color: black;
+    }
+    
     #initialScreen {
       display: flex;
       align-items: center;
@@ -151,13 +161,18 @@ button:hover {
       left: 0;
       width: 100%;
       height: 100%;
-      background-image: url('space.jpg');
-      background-size: cover;
-      background-repeat: no-repeat;
-      background-position: center;
-      opacity: 0.2; /* 옅은 투명도 설정 */
-      z-index: -1;
+      /* background-image: url('space.jpg');  기존 배경 이미지 제거 */
+      background-image: none;
+      z-index: -1; /* 게임 레인 뒤에 위치 */
+      overflow: hidden;
       display: none; /* 기본적으로 숨김 */
+    }
+
+    #backgroundVideo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* 비디오가 컨테이너를 완전히 채우도록 설정 */
+      opacity: 0.1; /* 투명도 조절 */
     }
 
     .lane {
@@ -175,7 +190,7 @@ button:hover {
       position: absolute;
       bottom: 100%;
       width: 100%;
-      height: 60px;
+      height: 200px;
       background: linear-gradient(to top, rgba(255, 255, 0, 0.8), rgba(255, 255, 0, 0)); /* 위아래 그라데이션 */
       border-radius: 10px; /* 부드러운 모서리 */
       transition: bottom 2s linear;
@@ -295,13 +310,15 @@ button:hover {
 
   <!-- 게임 화면 -->
   <div id="gameContainer">
-    <div id="gameBackground"></div>
+    <div id="gameBackground">
+      <video id="backgroundVideo" autoplay muted loop></video>
+    </div>
     <div class="scoreContainer">
       <h2>점수</h2>
       <div id="score" style="font-size: 50px;">0</div>
     </div>
     <div class="comboContainer">
-      <h2 >콤보</h2>
+      <h2>콤보</h2>
       <div id="combo" style="font-size: 50px;">0</div>
     </div>
     <div class="progressContainer">
@@ -353,9 +370,18 @@ button:hover {
       updateScore();
       updateCombo();
       updateLife();
+      
+      // 오디오 설정
       audio.src = song === 1 ? 'leneda.mp3' : 'starwalk.mp3';
       audio.volume = volumeSlider.value;
       audio.play();
+
+      // 비디오 설정
+      const backgroundVideo = document.getElementById('backgroundVideo');
+      backgroundVideo.src = song === 1 ? 'leneda.mp4' : 'starwalk.mp4'; // 사용하려는 비디오 파일 경로
+      backgroundVideo.play();
+
+      // 초기 화면과 게임 화면 전환
       document.getElementById('initialScreen').style.display = 'none';
       document.getElementById('gameContainer').style.display = 'block';
       document.getElementById('gameBackground').style.display = 'block';
@@ -382,7 +408,7 @@ button:hover {
       const speedMultiplier = 1 + 0.5 * (progressPercent / 100); // 1.0 ~ 1.5
 
       // 기본 이동 시간 (1x 속도 시 2초)
-      const baseDuration = 1.5; // 초
+      const baseDuration = 2; // 초
 
       // 현재 진행도에 따른 이동 시간 계산 (속도 증가 시 시간 감소)
       let duration = baseDuration / speedMultiplier;
@@ -391,7 +417,7 @@ button:hover {
       duration += (Math.random() * 0.2 - 0.1); // ±0.1초
 
       // 이동 시간 범위 제한 (예: 1.3초 ~ 2초)
-      duration = Math.max(1.0, Math.min(duration, 1.5));
+      duration = Math.max(1.3, Math.min(duration, 2));
 
       // 노트 생성 및 스타일 설정
       const target = document.createElement('div');
@@ -418,10 +444,12 @@ button:hover {
 
     function updateScore() {
       document.getElementById('score').textContent = score;
+      checkScoreThreshold();
     }
 
     function updateCombo() {
       document.getElementById('combo').textContent = combo;
+      checkComboThreshold();
     }
 
     function updateProgress(progressPercent) {
@@ -429,7 +457,9 @@ button:hover {
     }
 
     function updateLife() {
-      document.getElementById('life').textContent = life;
+      const lifeElement = document.getElementById('life');
+      lifeElement.textContent = life;
+      triggerLifeChange(); // 라이프가 업데이트 될 때 애니메이션 트리거
     }
 
     function endGame() {
@@ -519,55 +549,40 @@ button:hover {
     });
 
     // 애니메이션 트리거를 위한 변수
-let lastScoreThreshold = 0;
-let lastComboThreshold = 0;
+    let lastScoreThreshold = 0;
+    let lastComboThreshold = 0;
 
-function updateScore() {
-  document.getElementById('score').textContent = score;
-  checkScoreThreshold();
-}
+    // 점수 및 콤보가 100의 배수를 넘었는지 확인하고 애니메이션 트리거
+    function checkScoreThreshold() {
+      if (score >= lastScoreThreshold + 100) {
+        lastScoreThreshold += 100;
+        triggerHighlight('score');
+      }
+    }
 
-function updateCombo() {
-  document.getElementById('combo').textContent = combo;
-  checkComboThreshold();
-}
+    function checkComboThreshold() {
+      if (combo >= lastComboThreshold + 100) {
+        lastComboThreshold += 100;
+        triggerHighlight('combo');
+      }
+    }
 
-// 점수 및 콤보가 100의 배수를 넘었는지 확인하고 애니메이션 트리거
-function checkScoreThreshold() {
-  if (score >= lastScoreThreshold + 100) {
-    lastScoreThreshold += 100;
-    triggerHighlight('score');
-  }
-}
+    // 애니메이션 트리거 함수
+    function triggerHighlight(elementId) {
+      const element = document.getElementById(elementId);
+      element.classList.add('highlight');
+      setTimeout(() => {
+        element.classList.remove('highlight');
+      }, 500); // 애니메이션 지속 시간과 일치
+    }
 
-function checkComboThreshold() {
-  if (combo >= lastComboThreshold + 100) {
-    lastComboThreshold += 100;
-    triggerHighlight('combo');
-  }
-}
-
-// 애니메이션 트리거 함수
-function triggerHighlight(elementId) {
-  const element = document.getElementById(elementId);
-  element.classList.add('highlight');
-  setTimeout(() => {
-    element.classList.remove('highlight');
-  }, 500); // 애니메이션 지속 시간과 일치
-}
-
-function triggerLifeChange() {
-  const lifeElement = document.getElementById('life');
-  lifeElement.classList.add('life-change');
-  setTimeout(() => {
-    lifeElement.classList.remove('life-change');
-  }, 500); // 애니메이션 지속 시간과 일치
-}
-    function updateLife() {
-  const lifeElement = document.getElementById('life');
-  lifeElement.textContent = life;
-  triggerLifeChange(); // 라이프가 업데이트 될 때 애니메이션 트리거
-}
+    function triggerLifeChange() {
+      const lifeElement = document.getElementById('life');
+      lifeElement.classList.add('life-change');
+      setTimeout(() => {
+        lifeElement.classList.remove('life-change');
+      }, 500); // 애니메이션 지속 시간과 일치
+    }
   </script>
 </body>
 </html>
