@@ -71,6 +71,22 @@
   animation: lifeChange 0.5s ease;
 }
 
+button {
+  border: 2px solid white;
+  background-color: black;
+  color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-family: 'DNFBitBitv2', sans-serif;
+  cursor: pointer;
+  transition: all 0.3s ease; /* Smooth transition for hover effect */
+}
+
+button:hover {
+  background-color: white;
+  color: black;
+}
+
     #initialScreen {
       display: flex;
       align-items: center;
@@ -270,7 +286,7 @@
     <div class="message" style="margin-top: -300px;">
       <h2 style="font-size: 80px;">NOTE HITTER</h2>
       <div style="border: 1px; color: white;"></div>
-      <p style="color: gray; margin-top: 300px;">Press 1, 2, 3, 4 key to hit the note.</p>
+      <p style="color: gray;">Press 1, 2, 3, 4 key to hit the note.</p>
       <div class="blinking-text" style="color: white; margin-top:200px;">-Select background music.-</div>
     </div>
     <div class="music-button blue" onclick="startGame(1)"></div>
@@ -292,7 +308,7 @@
       <div>진행도</div>
       <div id="progress">0%</div>
     </div>
-    <div class="lifeContainer" style="font-style: bold;">
+    <div class="lifeContainer" style="font-style: bold; margin-left: 300px;">
       라이프 <span id="life">10</span>
     </div>
     <div id="lanes">
@@ -308,7 +324,7 @@
     <h1>게임 종료!</h1>
     <h2>최종 점수: <span id="finalScore">0</span></h2>
     <p>진행도: <span id="finalProgress"></span>%</p>
-    <button onclick="retryGame()">다시 도전하기</button>
+    <button onclick="retryGame()" style="font-style: ">다시 도전하기</button>
     <button onclick="goToInitialScreen()">초기화면으로</button>
   </div>
   <div class="volume-control">
