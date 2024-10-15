@@ -5,7 +5,7 @@
   <title>리듬게임</title>
  <style>
     body {
-      font-family: DNFBitBitv2; sans-serif;
+      font-family: 'DNFBitBitv2', sans-serif;
       background-color: black;
       color: white;
       display: flex;
@@ -16,8 +16,60 @@
       overflow: hidden;
     }
     @font-face{
-font-family:'DNFBitBitv2';
-font-style:normal;font-weight:400;src:url('https://cdn.df.nexon.com/img/common/font/DNFBitBitv2.otf')format('opentype')}
+      font-family:'DNFBitBitv2';
+      font-style:normal;
+      font-weight:400;
+      src:url('https://cdn.df.nexon.com/img/common/font/DNFBitBitv2.otf') format('opentype');
+    }
+    @keyframes highlight {
+  0% {
+    transform: scale(1);
+    color: white;
+  }
+  50% {
+    transform: scale(1.3);
+    color: yellow;
+  }
+  100% {
+    transform: scale(1);
+    color: white;
+  }
+}
+
+.highlight {
+  animation: highlight 0.5s ease;
+}
+
+@keyframes lifeChange {
+  0% {
+    transform: scale(1) translateX(0);
+    color: white;
+  }
+  10% {
+    transform: scale(1.2) translateX(-10px);
+    color: red;
+  }
+  20% {
+    transform: scale(1.1) translateX(10px);
+    color: white;
+  }
+  30% {
+    transform: scale(1.2) translateX(-10px);
+    color: red;
+  }
+  40% {
+    transform: scale(1.1) translateX(10px);
+    color: white;
+  }
+  50% {
+    transform: scale(1) translateX(0);
+    color: white;
+  }
+}
+
+.life-change {
+  animation: lifeChange 0.5s ease;
+}
 
     #initialScreen {
       display: flex;
@@ -34,30 +86,48 @@ font-style:normal;font-weight:400;src:url('https://cdn.df.nexon.com/img/common/f
       z-index: 1;
     }
 
-.music-button {
-  width: 25%;
-  height: 100%;
-  cursor: pointer;
-  background-size: cover;
-  background-position: center;
-  z-index: 1;
-  background-image: 
-    linear-gradient(to right, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0)),
-    url('your-image.jpg'); /* 기본 이미지 URL */
-}
+    .blinking-text {
+      animation: blink 1s step-start infinite;
+      font-size: 18px;
+      margin-top: 10px;
+      color: gray;
+    }
 
-.blue {
-  background-image: 
-    linear-gradient(to right, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0)),
-    url('leneda.jpg'); /* 파란색 버튼의 이미지 */
-  z-index: 1;
-}
-.red {
-  background-image: 
-    linear-gradient(to right, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0)),
-    url('starwalk.jpg'); /* 빨간색 버튼의 이미지 */
-  z-index: 1;
-}
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    .music-button {
+      width: 25%;
+      height: 120%;
+      cursor: pointer;
+      background-size: cover;
+      background-position: center;
+      z-index: 1;
+      transform: skew(-10deg);
+      border: 2px solid white;
+      background-image: 
+        linear-gradient(to right, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0)),
+        url('your-image.jpg'); /* 기본 이미지 URL */
+      transition: filter 0.3s ease; /* 추가된 부분 */
+    }
+
+    .music-button:hover {
+      filter: brightness(1.6); /* 마우스 호버 시 밝아짐 */
+    }
+
+    .blue {
+      background-image: 
+        linear-gradient(to right, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0)),
+        url('leneda.jpg'); /* 파란색 버튼의 이미지 */
+      z-index: 1;
+    }
+    .red {
+      background-image: 
+        linear-gradient(to right, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0)),
+        url('starwalk.jpg'); /* 빨간색 버튼의 이미지 */
+      z-index: 1;
+    }
 
     #gameBackground {
       position: absolute;
@@ -86,7 +156,7 @@ font-style:normal;font-weight:400;src:url('https://cdn.df.nexon.com/img/common/f
     }
 
     .target {
-     position: absolute;
+      position: absolute;
       bottom: 100%;
       width: 100%;
       height: 60px;
@@ -116,7 +186,18 @@ font-style:normal;font-weight:400;src:url('https://cdn.df.nexon.com/img/common/f
       width: 100%;
       height: 20%;
       background: linear-gradient(to top, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0));
+      transition: background 0.3s ease; /* 배경 전환 효과 추가 */
       z-index: 1;
+    }
+
+    /* 성공 시 초록색 오버레이 */
+    .hitZone.hit-success {
+      background: linear-gradient(to top, rgba(0, 255, 0, 0.5), rgba(0, 255, 0, 0));
+    }
+
+    /* 실패 시 빨간색 오버레이 */
+    .hitZone.hit-fail {
+      background: linear-gradient(to top, rgba(255, 0, 0, 0.5), rgba(255, 0, 0, 0));
     }
 
     #gameContainer {
@@ -134,25 +215,25 @@ font-style:normal;font-weight:400;src:url('https://cdn.df.nexon.com/img/common/f
     }
 
     .scoreContainer {
-      left: -100px;
+      left: -200px;
       top: 50%;
       transform: translateY(-50%);
       font-size: 30px;
     }
 
     .comboContainer {
-      right: -100px;
+      right: -200px;
       top: 50%;
       transform: translateY(-50%);
       font-size:30px;
     }
 
-  .progressContainer {
-    top: 20px;
-    left: -300px; /* 진행도가 라이프 옆에 오도록 설정 */
-    font-size: 24px;
-    font-weight: bold;
-  }
+    .progressContainer {
+      top: 20px;
+      left: -300px; /* 진행도가 라이프 옆에 오도록 설정 */
+      font-size: 24px;
+      font-weight: bold;
+    }
 
     .lifeContainer {
       top: 20px;
@@ -187,8 +268,10 @@ font-style:normal;font-weight:400;src:url('https://cdn.df.nexon.com/img/common/f
   <!-- 초기 화면 -->
   <div id="initialScreen">
     <div class="message" style="margin-top: -300px;">
-      <h2 style="font-size: 60px;">노트 맞추기 게임</h2>
-      <p style="color: gray; margin-top: 300px;">4개의 레인을 따라 내려오는 노트를 정확한 타이밍에 맞추세요. <br>숫자 키 1,2,3,4번으로 맞출 수 있습니다. <br>원하는 배경 음악을 선택하고 진행하세요.</p>
+      <h2 style="font-size: 80px;">NOTE HITTER</h2>
+      <div style="border: 1px; color: white;"></div>
+      <p style="color: gray; margin-top: 300px;">Press 1, 2, 3, 4 key to hit the note.</p>
+      <div class="blinking-text" style="color: white; margin-top:200px;">-Select background music.-</div>
     </div>
     <div class="music-button blue" onclick="startGame(1)"></div>
     <div class="music-button red" onclick="startGame(2)"></div>
@@ -199,18 +282,18 @@ font-style:normal;font-weight:400;src:url('https://cdn.df.nexon.com/img/common/f
     <div id="gameBackground"></div>
     <div class="scoreContainer">
       <h2>점수</h2>
-      <div id="score">0</div>
+      <div id="score" style="font-size: 50px;">0</div>
     </div>
     <div class="comboContainer">
-      <h2>콤보</h2>
-      <div id="combo">0</div>
+      <h2 >콤보</h2>
+      <div id="combo" style="font-size: 50px;">0</div>
     </div>
     <div class="progressContainer">
       <div>진행도</div>
       <div id="progress">0%</div>
     </div>
     <div class="lifeContainer" style="font-style: bold;">
-      라이프: <span id="life">10</span>
+      라이프 <span id="life">10</span>
     </div>
     <div id="lanes">
       <div class="lane" id="lane1"><div class="hitZone"></div></div>
@@ -289,6 +372,7 @@ font-style:normal;font-weight:400;src:url('https://cdn.df.nexon.com/img/common/f
           target.remove();
           life--;
           updateLife();
+          triggerHitZoneEffect(lane, 'fail'); // 틀렸을 때 효과
           if (life <= 0) { endGame(); }
         }
       });
@@ -333,6 +417,8 @@ font-style:normal;font-weight:400;src:url('https://cdn.df.nexon.com/img/common/f
           targets[index].remove();
           targets[index] = null;
         }
+        const hitZone = lane.querySelector('.hitZone');
+        hitZone.classList.remove('hit-success', 'hit-fail'); // 클래스 제거
       });
 
       startGame(1); // 기본적으로 첫 번째 음악으로 재시작
@@ -342,6 +428,22 @@ font-style:normal;font-weight:400;src:url('https://cdn.df.nexon.com/img/common/f
       clearInterval(gameInterval);  // 초기 화면으로 돌아갈 때 인터벌 초기화
       document.getElementById('endScreen').style.display = 'none';
       document.getElementById('initialScreen').style.display = 'flex';
+    }
+
+    // 히트존 효과 트리거 함수
+    function triggerHitZoneEffect(lane, result) {
+      const hitZone = lane.querySelector('.hitZone');
+      if (result === 'success') {
+        hitZone.classList.add('hit-success');
+        setTimeout(() => {
+          hitZone.classList.remove('hit-success');
+        }, 300); // 0.3초 후 원상복귀
+      } else if (result === 'fail') {
+        hitZone.classList.add('hit-fail');
+        setTimeout(() => {
+          hitZone.classList.remove('hit-fail');
+        }, 300); // 0.3초 후 원상복귀
+      }
     }
 
     // 키 입력 인식
@@ -355,6 +457,7 @@ font-style:normal;font-weight:400;src:url('https://cdn.df.nexon.com/img/common/f
       const laneIndex = keyMap[event.key];
 
       if (laneIndex !== undefined) {
+          const lane = lanes[laneIndex];
           if (targets[laneIndex]) {
               // 올바른 키 입력
               targets[laneIndex].classList.add('hit'); // 이펙트 적용
@@ -364,16 +467,69 @@ font-style:normal;font-weight:400;src:url('https://cdn.df.nexon.com/img/common/f
               combo += 1;
               updateScore();
               updateCombo();
+              triggerHitZoneEffect(lane, 'success'); // 성공 시 효과
           } else {
               // 잘못된 키 입력
               life--;
               updateLife();
               combo = 0; // 콤보 초기화
               updateCombo();
+              triggerHitZoneEffect(lane, 'fail'); // 실패 시 효과
               if (life <= 0) { endGame(); }
           }
       }
     });
+
+    // 애니메이션 트리거를 위한 변수
+let lastScoreThreshold = 0;
+let lastComboThreshold = 0;
+
+function updateScore() {
+  document.getElementById('score').textContent = score;
+  checkScoreThreshold();
+}
+
+function updateCombo() {
+  document.getElementById('combo').textContent = combo;
+  checkComboThreshold();
+}
+
+// 점수 및 콤보가 100의 배수를 넘었는지 확인하고 애니메이션 트리거
+function checkScoreThreshold() {
+  if (score >= lastScoreThreshold + 100) {
+    lastScoreThreshold += 100;
+    triggerHighlight('score');
+  }
+}
+
+function checkComboThreshold() {
+  if (combo >= lastComboThreshold + 100) {
+    lastComboThreshold += 100;
+    triggerHighlight('combo');
+  }
+}
+
+// 애니메이션 트리거 함수
+function triggerHighlight(elementId) {
+  const element = document.getElementById(elementId);
+  element.classList.add('highlight');
+  setTimeout(() => {
+    element.classList.remove('highlight');
+  }, 500); // 애니메이션 지속 시간과 일치
+}
+
+function triggerLifeChange() {
+  const lifeElement = document.getElementById('life');
+  lifeElement.classList.add('life-change');
+  setTimeout(() => {
+    lifeElement.classList.remove('life-change');
+  }, 500); // 애니메이션 지속 시간과 일치
+}
+    function updateLife() {
+  const lifeElement = document.getElementById('life');
+  lifeElement.textContent = life;
+  triggerLifeChange(); // 라이프가 업데이트 될 때 애니메이션 트리거
+}
   </script>
 </body>
 </html>
